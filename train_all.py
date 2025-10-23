@@ -3,4 +3,6 @@ from train import Train
 
 dataset = Train("rice")
 
-dataset.make_train()
+dataset.train_data()
+
+dataset.visualize_info()

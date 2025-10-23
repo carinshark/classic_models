@@ -10,6 +10,8 @@ class Train:
     def __init__(self,name):
         self.name = name
         self.info = {}
+
+        self.all_classifiers = [NearestCentroid(),KNeighborsClassifier(n_neighbors=1),KNeighborsClassifier(n_neighbors=3),DecisionTreeClassifier()]
     
     def make_train(self):
         x = np.load("data/"+self.name+"_data.npy")
@@ -45,32 +47,33 @@ class Train:
         x_tst = np.load("learn_data/"+self.name+"_test_data.npy")
         y_tst = np.load("learn_data/"+self.name+"_test_label.npy")
 
-        print("nearest centroid")
-        self.train_and_show(x_trn,y_trn,x_tst,y_tst,NearestCentroid())
-        print("KNeighbors, 1")
-        self.train_and_show(x_trn,y_trn,x_tst,y_tst,KNeighborsClassifier(n_neighbors=1))
-        print("KNeighbors, 3")
-        self.train_and_show(x_trn,y_trn,x_tst,y_tst,KNeighborsClassifier(n_neighbors=3))
-        print("DecisionTreeClassifier")
-        self.train_and_show(x_trn,y_trn,x_tst,y_tst,DecisionTreeClassifier())
+        for cls in self.all_classifiers:
+            self._train_and_show(x_trn,y_trn,x_tst,y_tst,cls)
 
-    def train_and_show(self,x_trn,y_trn,x_tst,y_tst,classifier):
+    def _train_and_show(self,x_trn,y_trn,x_tst,y_tst,classifier):
+        print(str(classifier))
         before = time.time()
         classifier.fit(x_trn,y_trn)
         fit = time.time()-before
         before = time.time()
         print(f"{""}")
         print(f"predictions :{classifier.predict(x_tst)}")
-        print(f"actual      :{y_tst}")
-        print(f"score: {classifier.score(x_tst,y_tst)}")
         elapsed = time.time()-before
+        print(f"actual      :{y_tst}")
+        score=classifier.score(x_tst,y_tst)
+        print(f"score: {score}")
+        
         print(f"time taken: {elapsed}")
 
         self.info[str(classifier)] = {
             "fitTime":fit,
-            "predictTime":elapsed
+            "predictTime":elapsed,
+            "score":score
         }
 
-
-
-    
+    def visualize_info(self):
+        for cls in self.info.keys():
+            data_dict = self.info[cls]
+            print(cls)
+            for data in data_dict.keys():
+                print(f"\t{data}: {self.info[cls][data]}")
