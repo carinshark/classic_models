@@ -1,8 +1,16 @@
 from train import Train
 
 
-dataset = Train("rice")
+iris = Train("iris")
 
-dataset.train_data()
+iris.train_data()
 
-dataset.visualize_info()
+bc = Train("bc")
+bc.train_data()
+
+rice = Train("rice")
+rice.train_data()
+
+iris.visualize_info()
+bc.visualize_info()
+rice.visualize_info()

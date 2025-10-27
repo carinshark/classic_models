@@ -2,6 +2,9 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB,MultinomialNB
+
 
 import time
 
@@ -11,7 +14,14 @@ class Train:
         self.name = name
         self.info = {}
 
-        self.all_classifiers = [NearestCentroid(),KNeighborsClassifier(n_neighbors=1),KNeighborsClassifier(n_neighbors=3),DecisionTreeClassifier()]
+        self.all_classifiers = [NearestCentroid(), #get center(mean)
+                                KNeighborsClassifier(n_neighbors=1), #nearest datapoint
+                                KNeighborsClassifier(n_neighbors=3), #3 nearest datapoints
+                                DecisionTreeClassifier(), #probabiliyy
+                                RandomForestClassifier(), #probability
+                                GaussianNB(), # probability
+                                MultinomialNB() # probability
+                                ]
     
     def make_train(self):
         x = np.load("data/"+self.name+"_data.npy")
@@ -72,6 +82,7 @@ class Train:
         }
 
     def visualize_info(self):
+        print(self.name)
         for cls in self.info.keys():
             data_dict = self.info[cls]
             print(cls)
