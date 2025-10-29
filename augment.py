@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn import decomposition
 
-file_name = "iris"
+self.name = "rice"
 
-x_trn = np.load(f"learn_data/{file_name}_train_data.npy")
-y_trn = np.load(f"learn_data/{file_name}_train_label.npy")
+x_trn = np.load(f"learn_data/{self.name}_train_data.npy")
+y_trn = np.load(f"learn_data/{self.name}_train_label.npy")
 
 columns = x_trn[0].size
 
@@ -12,9 +12,21 @@ pca = decomposition.PCA(n_components=columns)
 
 pca.fit(x_trn)
 
-print(pca.explained_variance_ratio_)
 
-start=2
+def get_start(ratio):
+    total = 0
+    for i in range(len(ratio)):
+        total += ratio[i]
+        if total>=.95:
+            return i+1
+        
+        
+ratio = pca.explained_variance_ratio_
+print(ratio)
+
+start=get_start(ratio)
+print(f"the start is {start}")
+
 
 sets = 10
 
@@ -51,4 +63,7 @@ for i in range(sets):
         new_train[(i*samp):(i*samp+samp),:] = generate(pca,x_trn,start)
 
         new_labels[(i*samp):(i*samp+samp)] = y_trn
+
+np.save(f"augmented_data/{self.name}_augment_data",new_train)
+np.save(f"augmented_data/{self.name}_augment_label",new_labels)
 
