@@ -13,6 +13,13 @@ class Train:
     def __init__(self,name):
         self.name = name
         self.info = {}
+        self.trn_label_name = self.name+"_train_data"
+        self.trn_data_name = self.name+"_train_label"
+        
+        self.tst_data_name = self.name+"_test_data"
+        self.tst_label_name = self.name+"_test_label"
+
+        
 
         self.all_classifiers = [NearestCentroid(), #get center(mean)
                                 KNeighborsClassifier(n_neighbors=1), #nearest datapoint
@@ -42,20 +49,20 @@ class Train:
         print("~~~")
 
         print(y)
-        np.save("learn_data/"+self.name+"_train_data.npy",x_train)
-        np.save("learn_data/"+self.name+"_train_label.npy",y_train)
+        np.save("learn_data/"+self.trn_label_name+".npy",x_train)
+        np.save("learn_data/"+self.trn_data_name+".npy",y_train)
 
-        np.save("learn_data/"+self.name+"_test_data.npy",x_test)
-        np.save("learn_data/"+self.name+"_test_label.npy",y_test)
+        np.save("learn_data/"+self.tst_data_name+".npy",x_test)
+        np.save("learn_data/"+self.tst_label_name+".npy",y_test)
 
 
     
     def train_data(self):
-        x_trn = np.load("learn_data/"+self.name+"_train_data.npy")
-        y_trn = np.load("learn_data/"+self.name+"_train_label.npy")
+        x_trn = np.load("learn_data/"+self.trn_label_name+".npy")
+        y_trn = np.load("learn_data/"+self.trn_data_name+".npy")
 
-        x_tst = np.load("learn_data/"+self.name+"_test_data.npy")
-        y_tst = np.load("learn_data/"+self.name+"_test_label.npy")
+        x_tst = np.load("learn_data/"+self.tst_data_name+".npy")
+        y_tst = np.load("learn_data/"+self.tst_label_name+".npy")
 
         for cls in self.all_classifiers:
             print("this line is running")
@@ -76,7 +83,7 @@ class Train:
         
         print(f"time taken: {elapsed}")
 
-        len(self.info.keys())==0:
+        if not (str(classifier) in self.info.keys()):
             self.info[str(classifier)] = {}
 
         self.info[str(classifier)][category] = {
@@ -90,7 +97,6 @@ class Train:
         for cls in self.info.keys():
             categories = self.info[cls]
             print(f"\t{cls}")
-            print(categories.keys())
             for cat in categories.keys():
                 data_dict = self.info[cls][cat]
                 print(f"\t\t{cat}")
@@ -169,8 +175,8 @@ class Train:
         x_trn = np.load("augmented_data/"+self.name+"_augment_data.npy")
         y_trn = np.load("augmented_data/"+self.name+"_augment_label.npy")
 
-        x_tst = np.load("learn_data/"+self.name+"_test_data.npy")
-        y_tst = np.load("learn_data/"+self.name+"_test_label.npy")
+        x_tst = np.load("learn_data/"+self.tst_data_name+".npy")
+        y_tst = np.load("learn_data/"+self.tst_label_name+".npy")
 
         for cls in self.all_classifiers:
             self._train_and_show(x_trn,y_trn,x_tst,y_tst,cls,"augmented")

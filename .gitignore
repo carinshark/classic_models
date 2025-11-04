@@ -1,0 +1,4 @@
+*.npy
+/.venv
+/learn_data
+/image_data
