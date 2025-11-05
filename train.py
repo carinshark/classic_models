@@ -5,6 +5,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB,MultinomialNB
 from sklearn import decomposition
+from sklearn.svm import LinearSVC
 
 import time
 
@@ -13,14 +14,14 @@ class Train:
     def __init__(self,name):
         self.name = name
         self.info = {}
-        self.trn_label_name = self.name+"_train_data"
-        self.trn_data_name = self.name+"_train_label"
+        self.trn_label_name = self.name+"_train_label"
+        self.trn_data_name = self.name+"_train_data"
         
         self.tst_data_name = self.name+"_test_data"
         self.tst_label_name = self.name+"_test_label"
 
         
-
+        #add classifier here to make it train with it
         self.all_classifiers = [NearestCentroid(), #get center(mean)
                                 KNeighborsClassifier(n_neighbors=1), #nearest datapoint
                                 KNeighborsClassifier(n_neighbors=3), #3 nearest datapoints
@@ -28,8 +29,10 @@ class Train:
                                 RandomForestClassifier(), #probability
                                 GaussianNB()#, # probability
                                 # MultinomialNB() # probability
+                                ,LinearSVC()
                                 ]
     
+    #split data into test and train
     def make_train(self):
         x = np.load("data/"+self.name+"_data.npy")
 
@@ -56,10 +59,10 @@ class Train:
         np.save("learn_data/"+self.tst_label_name+".npy",y_test)
 
 
-    
+    #train the normal version of the data
     def train_data(self):
-        x_trn = np.load("learn_data/"+self.trn_label_name+".npy")
-        y_trn = np.load("learn_data/"+self.trn_data_name+".npy")
+        y_trn = np.load("learn_data/"+self.trn_label_name+".npy")
+        x_trn = np.load("learn_data/"+self.trn_data_name+".npy")
 
         x_tst = np.load("learn_data/"+self.tst_data_name+".npy")
         y_tst = np.load("learn_data/"+self.tst_label_name+".npy")
@@ -68,9 +71,16 @@ class Train:
             print("this line is running")
             self._train_and_show(x_trn,y_trn,x_tst,y_tst,cls,"regular")
 
+    #trian data
     def _train_and_show(self,x_trn,y_trn,x_tst,y_tst,classifier,category):
         print(str(classifier))
         before = time.time()
+
+        # print("~~~~~~~~~")
+        # print(x_trn)
+        # print("~~~~~~~~~")
+        # print(y_trn)
+        
         classifier.fit(x_trn,y_trn)
         fit = time.time()-before
         before = time.time()
@@ -92,6 +102,7 @@ class Train:
             "score":score
         }
 
+    #print out dictionary storing all the info about how well it ran
     def visualize_info(self):
         print(self.name)
         for cls in self.info.keys():
@@ -106,7 +117,7 @@ class Train:
 
 
 
-                
+    
     def get_start(self,ratio):
         total = 0
         for i in range(len(ratio)):
@@ -114,8 +125,10 @@ class Train:
             if total>=.95:
                 return i+1
     
+
     def generate(self,pca,x,start):
-        # pca = decomposition.PCA() #REMOVE THIS BEFORE RUNNING!!!!!!!!!
+        # pca = decomposition.PCA() #COMMENT THIS BEFORE RUNNING!!!!!!!!!
+
         original = pca.components_.copy()
         
         num = pca.components_.shape[0]
@@ -131,6 +144,7 @@ class Train:
 
         return b
     
+    #fuzz data
     def augment(self):
 
         x_trn = np.load(f"learn_data/{self.name}_train_data.npy")
@@ -171,6 +185,7 @@ class Train:
         np.save(f"augmented_data/{self.name}_augment_data",new_train)
         np.save(f"augmented_data/{self.name}_augment_label",new_labels)
 
+    #train data that's already augmented
     def train_augmented(self):
         x_trn = np.load("augmented_data/"+self.name+"_augment_data.npy")
         y_trn = np.load("augmented_data/"+self.name+"_augment_label.npy")
