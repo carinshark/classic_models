@@ -14,6 +14,8 @@ class Train:
     def __init__(self,name):
         self.name = name
         self.info = {}
+
+        #the file names that are contained in /learn_data/, these can be replaced if needed
         self.trn_label_name = self.name+"_train_label"
         self.trn_data_name = self.name+"_train_data"
         
@@ -21,15 +23,15 @@ class Train:
         self.tst_label_name = self.name+"_test_label"
 
         
-        #add classifier here to make it train with it
+        #add classifier here to make it train with it. remove with del self.all_classifiers[index]
         self.all_classifiers = [NearestCentroid(), #get center(mean)
                                 KNeighborsClassifier(n_neighbors=1), #nearest datapoint
                                 KNeighborsClassifier(n_neighbors=3), #3 nearest datapoints
                                 DecisionTreeClassifier(), #probabiliyy
-                                RandomForestClassifier(), #probability
+                                RandomForestClassifier(n_estimators = 5), #probability
                                 GaussianNB()#, # probability
                                 # MultinomialNB() # probability
-                                ,LinearSVC()
+                                ,LinearSVC(kernel = "linear" and "rbf", C=1, gamma = 1/features)
                                 ]
     
     #split data into test and train
@@ -71,7 +73,8 @@ class Train:
             print("this line is running")
             self._train_and_show(x_trn,y_trn,x_tst,y_tst,cls,"regular")
 
-    #trian data
+    #trian data(preferable not to be used directly)
+    # category = the key 
     def _train_and_show(self,x_trn,y_trn,x_tst,y_tst,classifier,category):
         print(str(classifier))
         before = time.time()
@@ -117,7 +120,7 @@ class Train:
 
 
 
-    
+    #finding which values are important for augmenting(not to be used directly)
     def get_start(self,ratio):
         total = 0
         for i in range(len(ratio)):
@@ -127,7 +130,6 @@ class Train:
     
 
     def generate(self,pca,x,start):
-        # pca = decomposition.PCA() #COMMENT THIS BEFORE RUNNING!!!!!!!!!
 
         original = pca.components_.copy()
         
@@ -144,11 +146,11 @@ class Train:
 
         return b
     
-    #fuzz data
+    #fuzz data, stores in /augmented_data/
     def augment(self):
 
-        x_trn = np.load(f"learn_data/{self.name}_train_data.npy")
-        y_trn = np.load(f"learn_data/{self.name}_train_label.npy")
+        x_trn = np.load("learn_data/"+self.trn_data_name+".npy")
+        y_trn = np.load("learn_data/"+self.trn_label_name+".npy")
 
         columns = x_trn[0].size
 
